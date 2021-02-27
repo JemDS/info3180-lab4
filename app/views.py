@@ -23,7 +23,7 @@ def home():
 @app.route('/about/')
 def about():
     """Render the website's about page."""
-    return render_template('about.html', name="Mary Jane")
+    return render_template('about.html', name="Deidre-Ann Jemison")
 
 
 @app.route('/upload', methods=['POST', 'GET'])
