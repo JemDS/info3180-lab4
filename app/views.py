@@ -36,37 +36,45 @@ def upload():
 
     # Validate file upload on submit
     if  form.validate_on_submit():
+        if request.method == 'GET':
+            return render_template('upload.html', form=form)
+
         if request.method == 'POST':
         # Get file data and save to your uploads folder
             img = form.upload.data   #or img = request.files['file']
             filename = secure_filename(img.filename)
-            img.save(os.path.join(UPLOAD_FOLDER,filename))
+            img.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
             #img.save(os.path.join(app.instance_path, 'images',filename))
             
+            flash('Image uploaded successfully!', 'success')
+            return render_template('home.html')
 
-            flash('File Saved', 'success')
-            return redirect(url_for('home'))
-
+    flash_errors(form)
     return render_template('upload.html', form=form)
 
-def get_uploaded_images():
+def get_uploaded_images(): 
     imgs = []
-    rootdir = os.getcwd()
-    print(rootdir) 
-    
-    for subdir, dirs, files in os.walk(rootdir + app.config['UPLOAD_FOLDER']):
+    root_dir = os.getcwd()
+    print(root_dir) 
+ 
+    for subdir, dirs, files in os.walk(root_dir + app.config['UPLOAD_FOLDER']):
         for file in files:
-        #print(os.path.join(subdir, file))  
+            print(os.path.join(subdir, file))  
             imgs.append(file)
 
     return imgs 
 
+
 @app.route('/uploads/<filename>')
 def get_image(filename):
-    return send_from_firectory(app.config['UPLOAD_FOLDER'],filename)
+    #return send_from_directory(app.config['UPLOAD_FOLDER'],filename)
+    return send_from_directory(os.path.join(root_dir, app.config['UPLOAD_FOLDER']), filename)
 
 @app.route('/files')
 def files():
+    if not session.get('logged_in'):
+        abort(401)
+
     return render_template('files.html', images = get_uploaded_images())
 
 

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block main %}
+	<div class="grid">
+		{
+		<img src="{{url_for('get_image', filename=filename)}}" class="uimg" />
+	</div>
+{% endblock %}
+
+
+<!--<img src="{{url_for('static', filename='uploads/' + filename)}}"/> />
