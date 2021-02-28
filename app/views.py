@@ -49,6 +49,26 @@ def upload():
 
     return render_template('upload.html', form=form)
 
+def get_uploaded_images():
+    imgs = []
+    rootdir = os.getcwd()
+    print(rootdir) 
+    
+    for subdir, dirs, files in os.walk(rootdir + app.config['UPLOAD_FOLDER']):
+        for file in files:
+        #print(os.path.join(subdir, file))  
+            imgs.append(file)
+
+    return imgs 
+
+@app.route('/uploads/<filename>')
+def get_image(filename):
+    return send_from_firectory(app.config['UPLOAD_FOLDER'],filename)
+
+@app.route('/files')
+def files():
+    return render_template('files.html', images = get_uploaded_images())
+
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
