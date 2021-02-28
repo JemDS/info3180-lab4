@@ -36,14 +36,15 @@ def upload():
 
     # Validate file upload on submit
     if  form.validate_on_submit():
-        if request.method == 'GET':
-            return render_template('upload.html', form=form)
 
         if request.method == 'POST':
         # Get file data and save to your uploads folder
             img = form.upload.data   #or img = request.files['file']
+           
+            filefolder = app.config['UPLOAD_FOLDER']
             filename = secure_filename(img.filename)
-            img.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+            
+            img.save(os.path.join(filefolder,filename))
             #img.save(os.path.join(app.instance_path, 'images',filename))
             
             flash('Image uploaded successfully!', 'success')
@@ -54,28 +55,34 @@ def upload():
 
 def get_uploaded_images(): 
     imgs = []
-    root_dir = os.getcwd()
-    print(root_dir) 
- 
-    for subdir, dirs, files in os.walk(root_dir + app.config['UPLOAD_FOLDER']):
-        for file in files:
-            print(os.path.join(subdir, file))  
-            imgs.append(file)
 
+    rootdir = os.getcwd()
+    print(rootdir) 
+ 
+    for subdir, dirs, files in os.walk(rootdir):
+    #for subdir, dirs, files in os.walk(root_dir + app.config['UPLOAD_FOLDER']):
+        for file in files:
+            #print(os.path.join(subdir, file))
+            if (len(file) > 3): 
+                if file[-3:] in ['jpg','png'] :
+                    imgs.append(file)
     return imgs 
 
 
 @app.route('/uploads/<filename>')
 def get_image(filename):
+    rootdir = os.getcwd()
     #return send_from_directory(app.config['UPLOAD_FOLDER'],filename)
-    return send_from_directory(os.path.join(root_dir, app.config['UPLOAD_FOLDER']), filename)
+    return send_from_directory(os.path.join(rootdir, app.config['UPLOAD_FOLDER']), filename)
 
 @app.route('/files')
 def files():
     if not session.get('logged_in'):
         abort(401)
 
-    return render_template('files.html', images = get_uploaded_images())
+    images = get_uploaded_images()    
+
+    return render_template('files.html', images=images)
 
 
 @app.route('/login', methods=['POST', 'GET'])
