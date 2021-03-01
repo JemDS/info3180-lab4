@@ -9,6 +9,7 @@ from app import app
 from flask import render_template, request, redirect, url_for, flash, session, abort
 from werkzeug.utils import secure_filename
 from .forms import UploadForm
+from flask import send_from_directory
 
 ###
 # Routing for your application.
@@ -63,9 +64,8 @@ def get_uploaded_images():
     #for subdir, dirs, files in os.walk(root_dir + app.config['UPLOAD_FOLDER']):
         for file in files:
             #print(os.path.join(subdir, file))
-            if (len(file) > 3): 
-                if file[-3:] in ['jpg','png'] :
-                    imgs.append(file)
+            if (len(file) > 3) and (file[-3:] in ['jpg','png']) :
+                imgs.append(file)
     return imgs 
 
 
